@@ -231,9 +231,13 @@ let eq_Int: Eq Int = {
 in eq_Int
 ";
     let result = typecheck(text);
-    let bool = Type::alias(intern_unscoped("Bool"), vec![], Type::id(intern_unscoped("Bool")));
-    let eq = alias("Eq", &["a"], Type::record(vec![],
-                               vec![types::Field {
+    let bool = Type::alias(intern_unscoped("Bool"),
+                           vec![],
+                           Type::id(intern_unscoped("Bool")));
+    let eq = alias("Eq",
+                   &["a"],
+                   Type::record(vec![],
+                                vec![types::Field {
                                         name: intern_unscoped("=="),
                                         typ: Type::function(vec![typ("a"), typ("a")], bool),
                                     }]));
@@ -390,7 +394,7 @@ in { monad_State }
     assert_pass!(result);
 }
 
-///Test that not all fields are required when unifying record patterns
+/// Test that not all fields are required when unifying record patterns
 #[test]
 fn partial_pattern() {
     let _ = ::env_logger::init();
@@ -444,21 +448,24 @@ let return x: a -> IdT Test a = Test (Id x)
 return 1
 "#;
     let result = typecheck(text);
-    let variant = |name|
-        Type::variants(vec![(intern(name), Type::function(vec![typ("a")], Type::app(typ(name), vec![typ("a")])))]);
+    let variant = |name| {
+        Type::variants(vec![(intern(name), Type::function(vec![typ("a")], Type::app(typ(name), vec![typ("a")])))])
+    };
     let test = alias("Test", &["a"], variant("Test"));
     let m = Generic {
-                            kind: Kind::function(Kind::typ(), Kind::typ()),
-                            id: intern("m"),
-                        };
+        kind: Kind::function(Kind::typ(), Kind::typ()),
+        id: intern("m"),
+    };
 
     let id = alias("Id", &["a"], variant("Id"));
-    let id_t = Type::alias(intern("IdT"), vec![
+    let id_t = Type::alias(intern("IdT"),
+                           vec![
                         m.clone(),
                         Generic {
                             kind: Kind::typ(),
                             id: intern("a"),
-                        }], Type::app(Type::generic(m), vec![Type::app(id, vec![typ("a")])]));
+                        }],
+                           Type::app(Type::generic(m), vec![Type::app(id, vec![typ("a")])]));
     assert_eq!(result, Ok(Type::app(id_t, vec![test, typ("Int")])));
 }
 

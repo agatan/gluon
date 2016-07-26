@@ -14,7 +14,7 @@ use check::typecheck::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-///Returns a reference to the interner stored in TLD
+/// Returns a reference to the interner stored in TLD
 pub fn get_local_interner() -> Rc<RefCell<Symbols>> {
     thread_local!(static INTERNER: Rc<RefCell<Symbols>>
                   = Rc::new(RefCell::new(Symbols::new())));
@@ -39,7 +39,9 @@ pub fn intern(s: &str) -> Symbol {
     }
 }
 
-pub fn parse_new(s: &str) -> Result<ast::LExpr<TcIdent>, (Option<ast::LExpr<TcIdent>>, ::base::error::Errors<::parser::Error>)> {
+pub fn parse_new(s: &str)
+                 -> Result<ast::LExpr<TcIdent>,
+                           (Option<ast::LExpr<TcIdent>>, ::base::error::Errors<::parser::Error>)> {
     let symbols = get_local_interner();
     let mut symbols = symbols.borrow_mut();
     let mut module = SymbolModule::new("test".into(), &mut symbols);

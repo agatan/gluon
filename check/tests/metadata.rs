@@ -23,10 +23,11 @@ id
     assert!(result.is_ok(), "{}", result.unwrap_err());
 
     let metadata = metadata(&(), &mut expr);
-    assert_eq!(metadata, Metadata {
-        comment: Some("The identity function".into()),
-        module: Default::default(),
-    });
+    assert_eq!(metadata,
+               Metadata {
+                   comment: Some("The identity function".into()),
+                   module: Default::default(),
+               });
 }
 
 #[test]
@@ -41,10 +42,11 @@ let id x = x
     assert!(result.is_ok(), "{}", result.unwrap_err());
 
     let metadata = metadata(&(), &mut expr);
-    assert_eq!(metadata.module.get("id"), Some(&Metadata {
-        comment: Some("The identity function".into()),
-        module: Default::default(),
-    }));
+    assert_eq!(metadata.module.get("id"),
+               Some(&Metadata {
+                   comment: Some("The identity function".into()),
+                   module: Default::default(),
+               }));
 }
 
 #[test]
@@ -59,8 +61,9 @@ type Test = Int
     assert!(result.is_ok(), "{}", result.unwrap_err());
 
     let metadata = metadata(&(), &mut expr);
-    assert_eq!(metadata.module.get("Test"), Some(&Metadata {
-        comment: Some("A test type".into()),
-        module: Default::default(),
-    }));
+    assert_eq!(metadata.module.get("Test"),
+               Some(&Metadata {
+                   comment: Some("A test type".into()),
+                   module: Default::default(),
+               }));
 }

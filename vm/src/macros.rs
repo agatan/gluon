@@ -1,5 +1,5 @@
 //! Module providing the building blocks to create macros and expand them.
-use std::sync::RwLock;
+use std::sync::{Arc, RwLock};
 use std::collections::HashMap;
 use std::error::Error as StdError;
 
@@ -20,7 +20,6 @@ pub trait Macro: ::mopa::Any + Send + Sync {
               env: &Thread,
               arguments: &mut [ast::LExpr<TcIdent>])
               -> Result<ast::LExpr<TcIdent>, Error>;
-    fn clone(&self) -> Box<Macro>;
 }
 mopafy!(Macro);
 
@@ -33,15 +32,12 @@ impl<F: ::mopa::Any + Clone + Send + Sync> Macro for F
               -> Result<ast::LExpr<TcIdent>, Error> {
         self(env, arguments)
     }
-    fn clone(&self) -> Box<Macro> {
-        Box::new(Clone::clone(self))
-    }
 }
 
 /// Type containing macros bound to symbols which can be applied on an AST expression to transform
 /// it.
 pub struct MacroEnv {
-    macros: RwLock<HashMap<String, Box<Macro>>>,
+    macros: RwLock<HashMap<String, Arc<Macro>>>,
 }
 
 impl MacroEnv {
@@ -54,12 +50,12 @@ impl MacroEnv {
     pub fn insert<M>(&self, name: String, mac: M)
         where M: Macro + 'static
     {
-        self.macros.write().unwrap().insert(name, Box::new(mac));
+        self.macros.write().unwrap().insert(name, Arc::new(mac));
     }
 
     /// Retrieves the macro bound to `symbol`
-    pub fn get(&self, name: &str) -> Option<Box<Macro>> {
-        self.macros.read().unwrap().get(name).map(|x| (**x).clone())
+    pub fn get(&self, name: &str) -> Option<Arc<Macro>> {
+        self.macros.read().unwrap().get(name).cloned()
     }
 
     /// Runs the macros in this `MacroEnv` on `expr` using `env` as the context of the expansion

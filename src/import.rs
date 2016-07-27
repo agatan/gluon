@@ -170,12 +170,4 @@ impl<I> Macro for Import<I>
             _ => return Err(Error::String("Expected a string literal to import".into()).into()),
         }
     }
-
-    fn clone(&self) -> Box<Macro> {
-        Box::new(Import {
-            visited: RwLock::new(Vec::new()),
-            paths: RwLock::new(self.paths.read().unwrap().clone()),
-            importer: self.importer.clone(),
-        })
-    }
 }
